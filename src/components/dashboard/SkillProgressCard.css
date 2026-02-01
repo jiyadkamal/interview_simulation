@@ -1,0 +1,200 @@
+.skill-progress {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background: linear-gradient(180deg, #0f4c4d 0%, #0a2e2f 100%);
+}
+
+.skill-progress__header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.skill-progress__header-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-teal);
+}
+
+.skill-progress__title {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Sessions */
+.skill-progress__sessions {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-md);
+}
+
+.skill-progress__sessions-current {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.skill-progress__sessions-total {
+    font-size: var(--font-size-xl);
+    color: var(--text-muted);
+}
+
+.skill-progress__sessions-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Progress Bar */
+.skill-progress__bar {
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.skill-progress__bar-fill {
+    height: 100%;
+    background: var(--gradient-progress);
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+/* Divider */
+.skill-progress__divider {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.skill-progress__add-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    color: var(--text-primary);
+    font-size: var(--font-size-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-base);
+}
+
+.skill-progress__add-btn:hover {
+    background: var(--accent-teal);
+    color: var(--bg-primary);
+}
+
+/* Skills List */
+.skill-progress__skills {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.skill-progress__skill-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+}
+
+.skill-progress__skill-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: var(--bg-primary);
+}
+
+.skill-progress__skill-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.skill-progress__skill-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.skill-progress__skill-name {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.skill-progress__skill-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: rgba(74, 222, 128, 0.2);
+    color: var(--accent-green);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+.skill-progress__skill-score {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--accent-teal);
+    margin-left: auto;
+}
+
+.skill-progress__skill-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.skill-progress__skill-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+/* Skill Ring */
+.skill-progress__skill-percent {
+    width: 44px;
+    height: 44px;
+}
+
+.skill-progress__skill-ring {
+    width: 100%;
+    height: 100%;
+}
+
+.skill-progress__skill-ring-bg,
+.skill-progress__skill-ring-fill {
+    fill: none;
+    stroke-width: 3;
+}
+
+.skill-progress__skill-ring-bg {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+.skill-progress__skill-ring-fill {
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+}

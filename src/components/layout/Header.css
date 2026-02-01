@@ -1,0 +1,110 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background: transparent;
+}
+
+/* Left Section */
+.header__left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.header__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, #f472b6 0%, #a78bfa 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: white;
+    border: 2px solid var(--border-card);
+}
+
+.header__greeting-text {
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+}
+
+/* Title */
+.header__title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Actions */
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.header__action-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
+    border-radius: var(--radius-full);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-base);
+}
+
+.header__action-btn:hover {
+    background: var(--bg-card-elevated);
+    color: var(--text-primary);
+    border-color: var(--accent-teal);
+}
+
+.header__action-btn--icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+}
+
+.header__action-btn--date {
+    background: var(--bg-card-elevated);
+}
+
+.header__action-btn--notification {
+    position: relative;
+}
+
+.header__action-btn--notification::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--accent-teal);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--bg-card);
+}
+
+/* Grid Icon */
+.header__grid-icon {
+    display: grid;
+    grid-template-columns: repeat(2, 6px);
+    gap: 3px;
+}
+
+.header__grid-icon span {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-teal);
+    border-radius: 2px;
+}
