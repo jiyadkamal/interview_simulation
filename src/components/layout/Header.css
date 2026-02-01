@@ -17,7 +17,7 @@
     width: 48px;
     height: 48px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, #f472b6 0%, #a78bfa 100%);
+    background: var(--gradient-premium);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -25,6 +25,7 @@
     font-weight: 600;
     color: white;
     border: 2px solid var(--border-card);
+    box-shadow: var(--shadow-glow-teal);
 }
 
 .header__greeting-text {
@@ -34,12 +35,19 @@
 
 /* Title */
 .header__title {
-    font-size: var(--font-size-3xl);
-    font-weight: 700;
+    font-size: var(--font-size-2xl);
+    font-weight: 800;
+    font-family: var(--font-heading);
     color: var(--text-primary);
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--gradient-teal);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Actions */

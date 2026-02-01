@@ -33,7 +33,7 @@ export default function PerformanceGraph({
                 <div className="performance-graph__info">
                     <span className="performance-graph__label">Performance Score</span>
                     <div className="performance-graph__value-row">
-                        <span className="performance-graph__value">{currentScore}</span>
+                        <span className="performance-graph__value text-gradient">{currentScore}</span>
                         <span className="performance-graph__unit">/100</span>
                     </div>
                 </div>
@@ -54,8 +54,8 @@ export default function PerformanceGraph({
                     <AreaChart data={chartData} margin={{ top: 10, right: 40, left: 0, bottom: 20 }}>
                         <defs>
                             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#52c6c9" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#52c6c9" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#4fd1d9" stopOpacity={0.4} />
+                                <stop offset="95%" stopColor="#4fd1d9" stopOpacity={0} />
                             </linearGradient>
                         </defs>
                         <XAxis
@@ -87,9 +87,10 @@ export default function PerformanceGraph({
                         <Area
                             type="monotone"
                             dataKey="score"
-                            stroke="#52c6c9"
-                            strokeWidth={2}
+                            stroke="#4fd1d9"
+                            strokeWidth={3}
                             fill="url(#scoreGradient)"
+                            animationDuration={1500}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

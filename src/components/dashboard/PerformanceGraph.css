@@ -26,9 +26,10 @@
 
 .performance-graph__value {
     font-size: var(--font-size-4xl);
-    font-weight: 700;
-    color: var(--text-primary);
+    font-weight: 800;
+    font-family: var(--font-heading);
     line-height: 1;
+    letter-spacing: -0.02em;
 }
 
 .performance-graph__unit {
@@ -40,12 +41,13 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-    background: rgba(74, 222, 128, 0.15);
-    color: var(--accent-green);
+    background: var(--accent-teal-glow);
+    color: var(--accent-teal);
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
-    font-weight: 500;
+    font-weight: 600;
+    border: 1px solid var(--border-glow);
 }
 
 .performance-graph__subtitle {

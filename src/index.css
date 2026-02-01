@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 /* ============================================
    DESIGN SYSTEM - Smart Interview Platform
@@ -6,43 +6,45 @@
    ============================================ */
 
 :root {
-  /* Core Colors */
-  --bg-primary: #0a0d10;
-  --bg-secondary: #0f1318;
-  --bg-card: #131920;
-  --bg-card-elevated: #1a2129;
+  /* Core Colors - Professional Deep Theme */
+  --bg-primary: #0b0e11;
+  --bg-secondary: #11151a;
+  --bg-card: rgba(19, 25, 32, 0.7);
+  --bg-card-elevated: rgba(26, 33, 41, 0.85);
   --bg-sidebar: #0c1015;
 
-  /* Accent Colors */
-  --accent-teal: #52c6c9;
-  --accent-teal-glow: rgba(82, 198, 201, 0.3);
-  --accent-cyan: #00e5ff;
-  --accent-green: #4ade80;
-  --accent-yellow: #facc15;
-  --accent-orange: #fb923c;
+  /* Accent Colors - High Contrast & Vibrant */
+  --accent-teal: #4fd1d9;
+  --accent-teal-glow: rgba(79, 209, 217, 0.25);
+  --accent-cyan: #00f2ff;
+  --accent-green: #34d399;
+  --accent-yellow: #fbbf24;
+  --accent-orange: #f87171;
   --accent-pink: #f472b6;
-  --accent-purple: #a78bfa;
+  --accent-purple: #818cf8;
 
-  /* Gradients */
-  --gradient-teal: linear-gradient(135deg, #52c6c9 0%, #2dd4bf 100%);
-  --gradient-card-glow: linear-gradient(180deg, rgba(82, 198, 201, 0.08) 0%, transparent 100%);
-  --gradient-progress: linear-gradient(90deg, #52c6c9, #4ade80, #facc15);
-  --gradient-sidebar-active: linear-gradient(90deg, #52c6c9 0%, #2dd4bf 100%);
+  /* Gradients - Premium SaaS Feel */
+  --gradient-teal: linear-gradient(135deg, #4fd1d9 0%, #2dd4bf 100%);
+  --gradient-premium: linear-gradient(135deg, #4fd1d9 0%, #818cf8 50%, #f472b6 100%);
+  --gradient-card-glow: linear-gradient(180deg, rgba(79, 209, 217, 0.12) 0%, transparent 100%);
+  --gradient-progress: linear-gradient(90deg, #4fd1d9, #34d399, #fbbf24);
+  --gradient-sidebar-active: linear-gradient(90deg, rgba(79, 209, 217, 0.15) 0%, transparent 100%);
 
   /* Text Colors */
-  --text-primary: #ffffff;
+  --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
-  --text-accent: #52c6c9;
+  --text-accent: #4fd1d9;
 
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
+  /* Borders - Refined Glassmorphism */
+  --border-subtle: rgba(255, 255, 255, 0.04);
   --border-card: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(79, 209, 217, 0.3);
 
-  /* Shadows */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-glow-teal: 0 0 30px rgba(82, 198, 201, 0.15);
-  --shadow-glow-strong: 0 0 60px rgba(82, 198, 201, 0.25);
+  /* Shadows - Deep & Sophisticated */
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow-teal: 0 0 40px rgba(79, 209, 217, 0.15);
+  --shadow-glow-strong: 0 0 60px rgba(79, 209, 217, 0.25);
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -55,28 +57,29 @@
   /* Border Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
   --radius-full: 9999px;
 
   /* Typography */
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
   --font-size-xl: 1.25rem;
   --font-size-2xl: 1.5rem;
-  --font-size-3xl: 2rem;
-  --font-size-4xl: 2.5rem;
+  --font-size-3xl: 2.25rem;
+  --font-size-4xl: 3.5rem;
 
   /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 400ms ease;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Layout */
-  --sidebar-width: 260px;
+  --sidebar-width: 280px;
   --header-height: 80px;
 }
 
@@ -143,12 +146,25 @@ img {
   border: 1px solid var(--border-card);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-card-glow);
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .glass-card--elevated {
   background: var(--bg-card-elevated);
   box-shadow: var(--shadow-card), var(--shadow-glow-teal);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Glow Effects */
@@ -198,15 +214,29 @@ img {
 }
 
 .text-2xl {
+  font-family: var(--font-heading);
   font-size: var(--font-size-2xl);
+  line-height: 1.2;
 }
 
 .text-3xl {
+  font-family: var(--font-heading);
   font-size: var(--font-size-3xl);
+  line-height: 1.2;
 }
 
 .text-4xl {
+  font-family: var(--font-heading);
   font-size: var(--font-size-4xl);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.text-gradient {
+  background: var(--gradient-premium);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .font-light {

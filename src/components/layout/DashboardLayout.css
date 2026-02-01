@@ -6,7 +6,8 @@
 
 .dashboard-layout__main {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    margin-left: calc(var(--sidebar-width) + 40px);
+    padding-top: 20px;
     display: flex;
     flex-direction: column;
     position: relative;
