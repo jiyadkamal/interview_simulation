@@ -65,11 +65,11 @@ router.get('/stats', authenticateToken, async (req, res) => {
             }
         });
 
-        // Calculate weekly progress (last 4 weeks, oldest first)
+        // Calculate weekly progress (last 8 weeks, oldest first)
         const weeklyProgress = [];
         const now = new Date();
 
-        for (let i = 3; i >= 0; i--) {
+        for (let i = 7; i >= 0; i--) {
             const weekStart = new Date(now);
             weekStart.setDate(weekStart.getDate() - (i * 7) - 6);
             weekStart.setHours(0, 0, 0, 0);

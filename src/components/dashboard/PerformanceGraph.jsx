@@ -15,6 +15,10 @@ export default function PerformanceGraph({
             interviews: w.interviews || 0
         }))
         : [
+            { name: '7w ago', score: 0 },
+            { name: '6w ago', score: 0 },
+            { name: '5w ago', score: 0 },
+            { name: '4w ago', score: 0 },
             { name: '3w ago', score: 0 },
             { name: '2w ago', score: 0 },
             { name: 'Last Week', score: 0 },
@@ -42,12 +46,12 @@ export default function PerformanceGraph({
             </div>
 
             <div className="performance-graph__subtitle">
-                <span>Score Trend (Last 4 Weeks)</span>
+                <span>Score Trend (Last 8 Weeks)</span>
             </div>
 
             <div className="performance-graph__chart">
                 <ResponsiveContainer width="100%" height={180}>
-                    <AreaChart data={chartData}>
+                    <AreaChart data={chartData} margin={{ top: 10, right: 40, left: 0, bottom: 20 }}>
                         <defs>
                             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#52c6c9" stopOpacity={0.3} />
@@ -60,6 +64,7 @@ export default function PerformanceGraph({
                             tickLine={false}
                             tick={{ fill: '#64748b', fontSize: 11 }}
                             interval={0}
+                            padding={{ left: 10, right: 10 }}
                         />
                         <YAxis
                             axisLine={false}
