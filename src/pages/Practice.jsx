@@ -153,8 +153,11 @@ export default function Practice() {
     const submitAnswer = async () => {
         if (!transcript.trim()) return;
 
-        // Stop any ongoing speech
+        // Stop recording and speech
+        stopListening();
         stopSpeaking();
+
+        const currentTranscript = transcript;
 
         setIsLoading(true);
         try {
@@ -162,14 +165,14 @@ export default function Practice() {
             const data = await interviewAPI.submitAnswer(
                 interview.interviewId,
                 question.id,
-                transcript,
-                transcript
+                currentTranscript,
+                currentTranscript
             );
             setEvaluations([...evaluations, data.evaluation]);
 
             if (currentQuestionIndex < interview.questions.length - 1) {
-                setCurrentQuestionIndex(currentQuestionIndex + 1);
                 resetTranscript();
+                setCurrentQuestionIndex(currentQuestionIndex + 1);
             } else {
                 // Complete interview
                 const results = await interviewAPI.completeInterview(interview.interviewId);

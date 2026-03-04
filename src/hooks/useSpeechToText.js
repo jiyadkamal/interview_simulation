@@ -6,6 +6,7 @@ export function useSpeechToText() {
     const [error, setError] = useState(null);
     const recognitionRef = useRef(null);
     const shouldListenRef = useRef(false);
+    const finalTranscriptRef = useRef('');
 
     const SpeechRecognition = typeof window !== 'undefined'
         ? (window.SpeechRecognition || window.webkitSpeechRecognition)
@@ -18,55 +19,49 @@ export function useSpeechToText() {
             try { recognitionRef.current.abort(); } catch (e) { /* ignore */ }
             recognitionRef.current = null;
         }
+        // Lock in whatever we have as final
+        setTranscript(finalTranscriptRef.current.trim());
     }, []);
 
-    const startListening = useCallback(() => {
-        if (!SpeechRecognition) {
-            setError('Speech recognition not supported in this browser.');
-            return;
-        }
+    const createRecognition = useCallback(() => {
+        if (!SpeechRecognition) return null;
 
-        // Always kill any existing session first
-        if (recognitionRef.current) {
-            try { recognitionRef.current.abort(); } catch (e) { /* ignore */ }
-            recognitionRef.current = null;
-        }
-
-        setError(null);
-        shouldListenRef.current = true;
-
-        // Create a fresh instance every time
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = 'en-US';
-        recognitionRef.current = recognition;
-
-        let finalText = '';
 
         recognition.onresult = (event) => {
+            // Only process NEW results from this session
+            let sessionFinal = '';
             let interim = '';
-            finalText = '';
+
             for (let i = 0; i < event.results.length; i++) {
                 const text = event.results[i][0].transcript;
                 if (event.results[i].isFinal) {
-                    finalText += text + ' ';
+                    sessionFinal += text + ' ';
                 } else {
                     interim += text;
                 }
             }
-            setTranscript(finalText + interim);
+
+            // Combine: text from previous sessions + this session's final + interim
+            const baseFinal = finalTranscriptRef.current;
+            // Update ref with accumulated finals (base + this session)
+            // But only store session finals when they're actually final
+            const fullFinal = baseFinal + sessionFinal;
+            setTranscript((fullFinal + interim).trim());
+
+            // Store the session finals so we don't lose them
+            // We update the ref only with truly final text
+            if (sessionFinal) {
+                finalTranscriptRef.current = fullFinal;
+            }
         };
 
         recognition.onerror = (event) => {
-            // "aborted" happens when we intentionally stop — ignore it
             if (event.error === 'aborted') return;
-
-            // "no-speech" is recoverable — the mic is on but user hasn't spoken
-            if (event.error === 'no-speech') {
-                // onend will fire after this; the restart logic there handles it
-                return;
-            }
+            if (event.error === 'no-speech') return;
 
             console.error('Speech error:', event.error);
             setError(`Mic error: ${event.error}`);
@@ -76,62 +71,61 @@ export function useSpeechToText() {
         };
 
         recognition.onend = () => {
-            // If we still want to listen, auto-restart with a fresh instance
             if (shouldListenRef.current) {
+                // Auto-restart with fresh instance, keeping accumulated text
                 try {
-                    const newRecognition = new SpeechRecognition();
-                    newRecognition.continuous = true;
-                    newRecognition.interimResults = true;
-                    newRecognition.lang = 'en-US';
-
-                    // Carry over the accumulated final text
-                    const savedFinal = finalText;
-
-                    newRecognition.onresult = (event) => {
-                        let newFinal = '';
-                        let interim = '';
-                        for (let i = 0; i < event.results.length; i++) {
-                            const text = event.results[i][0].transcript;
-                            if (event.results[i].isFinal) {
-                                newFinal += text + ' ';
-                            } else {
-                                interim += text;
-                            }
-                        }
-                        finalText = savedFinal + newFinal;
-                        setTranscript(finalText + interim);
-                    };
-
-                    newRecognition.onerror = recognition.onerror;
-                    newRecognition.onend = recognition.onend;
-
-                    recognitionRef.current = newRecognition;
-                    newRecognition.start();
+                    const newRec = createRecognition();
+                    if (newRec) {
+                        recognitionRef.current = newRec;
+                        newRec.start();
+                    }
                 } catch (e) {
                     console.error('Auto-restart failed:', e);
                     shouldListenRef.current = false;
                     setIsListening(false);
-                    recognitionRef.current = null;
                 }
                 return;
             }
-
             setIsListening(false);
             recognitionRef.current = null;
         };
+
+        return recognition;
+    }, [SpeechRecognition]);
+
+    const startListening = useCallback(() => {
+        if (!SpeechRecognition) {
+            setError('Speech recognition not supported.');
+            return;
+        }
+
+        // Kill existing session
+        if (recognitionRef.current) {
+            try { recognitionRef.current.abort(); } catch (e) { /* ignore */ }
+            recognitionRef.current = null;
+        }
+
+        setError(null);
+        shouldListenRef.current = true;
+        // Don't reset finalTranscriptRef here — keep accumulated text across start/stop
+
+        const recognition = createRecognition();
+        if (!recognition) return;
+
+        recognitionRef.current = recognition;
 
         try {
             recognition.start();
             setIsListening(true);
         } catch (e) {
-            console.error('Failed to start speech recognition:', e);
-            setError('Could not start recording. Please try again.');
+            console.error('Failed to start:', e);
+            setError('Could not start recording.');
             shouldListenRef.current = false;
-            recognitionRef.current = null;
         }
-    }, [SpeechRecognition]);
+    }, [SpeechRecognition, createRecognition]);
 
     const resetTranscript = useCallback(() => {
+        finalTranscriptRef.current = '';
         setTranscript('');
     }, []);
 
