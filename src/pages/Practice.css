@@ -534,3 +534,91 @@
         transform: rotate(360deg);
     }
 }
+
+/* Question Count Selection */
+.practice__count {
+    text-align: center;
+}
+
+.practice__count-input-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+}
+
+.practice__count-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xl) var(--spacing-2xl);
+    min-width: 280px;
+}
+
+.practice__count-field-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.practice__count-input {
+    width: 120px;
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-card-elevated);
+    border: 2px solid var(--border-card);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    outline: none;
+    transition: all var(--transition-base);
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.practice__count-input::-webkit-outer-spin-button,
+.practice__count-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.practice__count-input:focus {
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px var(--accent-teal-glow);
+}
+
+.practice__count-hint {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.practice__start-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-2xl);
+    background: var(--gradient-teal);
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--bg-primary);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-width: 200px;
+}
+
+.practice__start-btn:hover:not(:disabled) {
+    box-shadow: var(--shadow-glow-strong);
+    transform: translateY(-2px);
+}
+
+.practice__start-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

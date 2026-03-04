@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context';
-import { Dashboard, Login, Register, Practice, Landing } from './pages';
+import { Dashboard, Login, Register, Practice, Landing, Admin } from './pages';
 import './index.css';
 
 // Protected Route component
@@ -24,7 +24,7 @@ function ProtectedRoute({ children }) {
 
 // Public Route - redirects to dashboard if already logged in
 function PublicRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -35,7 +35,7 @@ function PublicRoute({ children }) {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />;
   }
 
   return children;
@@ -81,6 +81,11 @@ function AppRoutes() {
       <Route path="/settings" element={
         <ProtectedRoute>
           <Dashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/admin" element={
+        <ProtectedRoute>
+          <Admin />
         </ProtectedRoute>
       } />
     </Routes>

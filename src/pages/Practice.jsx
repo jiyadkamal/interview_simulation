@@ -66,9 +66,10 @@ const speakQuestion = (text) => {
 };
 
 export default function Practice() {
-    const [stage, setStage] = useState('select'); // select, topic, interview, results
+    const [stage, setStage] = useState('select'); // select, topic, count, interview, results
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedTopic, setSelectedTopic] = useState(null);
+    const [numQuestions, setNumQuestions] = useState(5);
     const [interview, setInterview] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [results, setResults] = useState(null);
@@ -102,27 +103,32 @@ export default function Practice() {
             // Go to topic selection for technical
             setStage('topic');
         } else {
-            // Start interview directly
-            startInterview(category, null);
+            // Go to question count selection
+            setStage('count');
         }
     };
 
     const handleTopicSelect = (topicId) => {
         setSelectedTopic(topicId);
-        startInterview(selectedCategory, topicId);
+        setStage('count');
     };
 
-    const startInterview = async (category, topic) => {
+    const handleStartWithCount = () => {
+        const count = Math.min(20, Math.max(1, numQuestions));
+        setNumQuestions(count);
+        startInterview(selectedCategory, selectedTopic, count);
+    };
+
+    const startInterview = async (category, topic, count) => {
         setIsLoading(true);
         try {
-            const data = await interviewAPI.startInterview(category, topic);
+            const data = await interviewAPI.startInterview(category, topic, count);
             setInterview(data);
             setStage('interview');
             setCurrentQuestionIndex(0);
             setEvaluations([]);
         } catch (error) {
             console.error('Failed to start interview:', error);
-            // Fallback - still start with API, but show error
             alert('Failed to connect to server. Please try again.');
             setStage('select');
         } finally {
@@ -183,6 +189,7 @@ export default function Practice() {
         setStage('select');
         setSelectedCategory(null);
         setSelectedTopic(null);
+        setNumQuestions(5);
         setInterview(null);
         setResults(null);
         setCurrentQuestionIndex(0);
@@ -194,6 +201,15 @@ export default function Practice() {
         if (stage === 'topic') {
             setStage('select');
             setSelectedCategory(null);
+        } else if (stage === 'count') {
+            const cat = categories.find(c => c.id === selectedCategory);
+            if (cat?.topics) {
+                setStage('topic');
+                setSelectedTopic(null);
+            } else {
+                setStage('select');
+                setSelectedCategory(null);
+            }
         }
     };
 
@@ -204,7 +220,7 @@ export default function Practice() {
                 {stage === 'select' && (
                     <div className="practice__select animate-fade-in">
                         <h2 className="practice__title">Choose Interview Type</h2>
-                        <p className="practice__subtitle">Select a category to start your practice session (5 questions)</p>
+                        <p className="practice__subtitle">Select a category to start your practice session</p>
 
                         <div className="practice__categories">
                             {categories.map((cat) => (
@@ -257,6 +273,54 @@ export default function Practice() {
                             <div className="practice__loading">
                                 <div className="practice__loading-spinner"></div>
                                 <p>Preparing your interview questions...</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Question Count Selection */}
+                {stage === 'count' && (
+                    <div className="practice__count animate-fade-in">
+                        <button className="practice__back-btn" onClick={goBack}>
+                            <ChevronLeft size={20} />
+                            Back
+                        </button>
+
+                        <h2 className="practice__title">How Many Questions?</h2>
+                        <p className="practice__subtitle">
+                            Choose the number of questions for your {categories.find(c => c.id === selectedCategory)?.name} session
+                            {selectedTopic && ` — ${categories.find(c => c.id === selectedCategory)?.topics?.find(t => t.id === selectedTopic)?.name}`}
+                        </p>
+
+                        <div className="practice__count-input-wrap">
+                            <div className="practice__count-field glass-card">
+                                <label className="practice__count-field-label" htmlFor="numQuestions">Number of Questions</label>
+                                <input
+                                    id="numQuestions"
+                                    type="number"
+                                    className="practice__count-input"
+                                    value={numQuestions}
+                                    onChange={(e) => setNumQuestions(Math.max(1, parseInt(e.target.value) || 1))}
+                                    min={1}
+                                    max={20}
+                                    disabled={isLoading}
+                                />
+                                <span className="practice__count-hint">Enter 1 to 20 questions</span>
+                            </div>
+                            <button
+                                className="practice__start-btn"
+                                onClick={handleStartWithCount}
+                                disabled={isLoading || numQuestions < 1}
+                            >
+                                {isLoading ? 'Generating...' : 'Start Interview'}
+                                <ArrowRight size={18} />
+                            </button>
+                        </div>
+
+                        {isLoading && (
+                            <div className="practice__loading">
+                                <div className="practice__loading-spinner"></div>
+                                <p>Generating {numQuestions} questions with AI...</p>
                             </div>
                         )}
                     </div>
@@ -398,7 +462,7 @@ export default function Practice() {
                 )}
 
                 {/* Loading Overlay */}
-                {isLoading && stage === 'select' && (
+                {isLoading && (stage === 'select') && (
                     <div className="practice__loading-overlay">
                         <div className="practice__loading-spinner"></div>
                         <p>Generating questions with AI...</p>

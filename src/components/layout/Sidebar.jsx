@@ -7,7 +7,8 @@ import {
   Settings,
   LogOut,
   LogIn,
-  Sparkles
+  Sparkles,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '../../context';
 import './Sidebar.css';
@@ -32,6 +33,8 @@ export default function Sidebar() {
   const handleLogin = () => {
     navigate('/login');
   };
+
+  const isAdmin = user?.role === 'admin';
 
   return (
     <aside className="sidebar">
@@ -60,6 +63,19 @@ export default function Sidebar() {
               </NavLink>
             </li>
           ))}
+          {isAdmin && (
+            <li>
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `sidebar__nav-item sidebar__nav-item--admin ${isActive ? 'sidebar__nav-item--active' : ''}`
+                }
+              >
+                <Shield size={20} />
+                <span>Admin</span>
+              </NavLink>
+            </li>
+          )}
         </ul>
       </nav>
 

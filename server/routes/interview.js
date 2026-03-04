@@ -8,15 +8,18 @@ const router = express.Router();
 // Start a new interview session
 router.post('/start', authenticateToken, async (req, res) => {
     try {
-        const { category, topic } = req.body;
+        const { category, topic, numQuestions: rawNum } = req.body;
         const userId = req.user.userId;
 
         if (!['hr', 'technical', 'aptitude'].includes(category)) {
             return res.status(400).json({ error: 'Invalid category. Use: hr, technical, or aptitude' });
         }
 
+        // Clamp numQuestions to 1-20, default 5
+        const numQuestions = Math.min(20, Math.max(1, parseInt(rawNum) || 5));
+
         // Generate questions using Gemini (with topic for technical)
-        const questions = await generateInterviewQuestions(category, topic);
+        const questions = await generateInterviewQuestions(category, topic, numQuestions);
 
         const interviewId = `interview_${Date.now()}`;
         const interviewData = {

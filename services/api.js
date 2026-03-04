@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = '/api';
 
 // Helper function for API calls
 async function apiCall(endpoint, options = {}) {
@@ -42,10 +42,10 @@ export const authAPI = {
 
 // Interview API
 export const interviewAPI = {
-    startInterview: (category, topic = null, numQuestions = 5) =>
+    startInterview: (category, topic = null) =>
         apiCall('/interview/start', {
             method: 'POST',
-            body: JSON.stringify({ category, topic, numQuestions }),
+            body: JSON.stringify({ category, topic }),
         }),
 
     submitAnswer: (interviewId, questionId, answer, speechText) =>
@@ -70,9 +70,4 @@ export const dashboardAPI = {
     getSchedule: () => apiCall('/dashboard/schedule'),
 };
 
-// Admin API
-export const adminAPI = {
-    getStats: () => apiCall('/admin/stats'),
-};
-
-export default { authAPI, interviewAPI, dashboardAPI, adminAPI };
+export default { authAPI, interviewAPI, dashboardAPI };
