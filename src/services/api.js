@@ -42,10 +42,10 @@ export const authAPI = {
 
 // Interview API
 export const interviewAPI = {
-    startInterview: (category, topic = null, numQuestions = 5) =>
+    startInterview: (interviewType, numQuestions = 5) =>
         apiCall('/interview/start', {
             method: 'POST',
-            body: JSON.stringify({ category, topic, numQuestions }),
+            body: JSON.stringify({ interviewType, numQuestions }),
         }),
 
     submitAnswer: (interviewId, questionId, answer, speechText) =>

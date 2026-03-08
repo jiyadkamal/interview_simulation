@@ -50,77 +50,26 @@ async function callGroqAPI(messages) {
     }
 }
 
-// Topic descriptions for technical interviews
-const technicalTopics = {
-    dsa: 'Data Structures and Algorithms (arrays, linked lists, trees, graphs, sorting, searching)',
-    webdev: 'Web Development (HTML, CSS, JavaScript, React, Node.js, APIs)',
-    python: 'Python Programming (syntax, data types, OOP, libraries, best practices)',
-    java: 'Java Programming (OOP concepts, collections, multithreading, JVM)',
-    database: 'Database and SQL (queries, joins, normalization, indexing, transactions)',
-    os: 'Operating Systems (processes, threads, memory management, scheduling)',
-    networking: 'Computer Networks (TCP/IP, HTTP, DNS, security, protocols)',
-};
-
-// Generate interview questions based on category and optional topic
-export async function generateInterviewQuestions(category, topic = null, numQuestions = 5) {
-    let prompt;
-
-    if (category === 'hr') {
-        const randomSeed = Date.now();
-        prompt = `You are an expert HR interview coach. Generate exactly ${numQuestions} UNIQUE and VARIED HR/behavioral interview questions for a student preparing for job interviews.
+// Generate interview questions based on interview type
+export async function generateInterviewQuestions(interviewType, numQuestions = 5) {
+    const randomSeed = Date.now();
+    const prompt = `You are an expert interview coach. Generate exactly ${numQuestions} UNIQUE and VARIED interview questions for: "${interviewType}".
 
 IMPORTANT: Generate DIFFERENT questions each time. Be creative and varied. Session ID: ${randomSeed}
 
-Choose from these HR interview themes (pick different combinations):
-- Self-introduction and background
-- Strengths, weaknesses, skills
-- Career goals and motivation
-- Teamwork and collaboration
-- Leadership and initiative
-- Conflict resolution
-- Problem-solving scenarios
-- Work ethic and values
-- Adaptability and learning
-- Handling pressure and deadlines
+The questions should be:
+- Highly relevant and specific to the interview type "${interviewType}"
+- Appropriate for the context (e.g., if it's a school entry interview, ask age-appropriate questions; if it's a tech job, ask technical questions)
+- A good mix of behavioral, situational, and domain-specific questions
+- Practical and commonly asked in real interviews of this type
+- Answerable verbally
 
 Return ONLY a JSON array in this exact format, nothing else:
 [{"id": 1, "question": "...", "tips": "..."}]
 
-Make each question distinct and practical for real interviews.`;
-    } else if (category === 'technical') {
-        const randomSeed = Date.now();
-        const topicDesc = technicalTopics[topic] || 'general programming and computer science concepts';
-        prompt = `You are an expert technical interviewer. Generate exactly ${numQuestions} UNIQUE technical interview questions about ${topicDesc} for a student/fresher level candidate.
+Make each question distinct and useful for real interview preparation.`;
 
-IMPORTANT: Generate DIFFERENT questions each time. Be creative and varied. Session ID: ${randomSeed}
-
-Questions should:
-- Be appropriate for fresher/entry-level candidates
-- Test understanding, not just memorization
-- Include a mix of conceptual and practical questions
-- Be answerable verbally (not coding problems requiring IDE)
-
-Return ONLY a JSON array in this exact format, nothing else:
-[{"id": 1, "question": "...", "tips": "..."}]`;
-    } else if (category === 'aptitude') {
-        const randomSeed = Date.now();
-        prompt = `You are an aptitude test expert. Generate exactly ${numQuestions} UNIQUE aptitude/reasoning questions for a student preparing for placement tests.
-
-IMPORTANT: Generate DIFFERENT questions each time with different numbers, scenarios, and patterns. Session ID: ${randomSeed}
-
-Include a mix of:
-- Mathematical reasoning (percentages, ratios, speed/time/distance, work problems)
-- Logical reasoning (sequences, patterns, puzzles)
-- Verbal reasoning (analogies, statements, syllogisms)
-- Critical thinking and data interpretation
-
-Return ONLY a JSON array in this exact format, nothing else:
-[{"id": 1, "question": "...", "tips": "..."}]
-
-Make questions challenging but solvable verbally without paper.`;
-    }
-
-    console.log(`Generating ${numQuestions} ${category} questions${topic ? ` for topic: ${topic}` : ''}...`);
+    console.log(`Generating ${numQuestions} questions for interview type: "${interviewType}"...`);
 
     const response = await callGroqAPI([
         { role: 'system', content: 'You are an interview preparation assistant. Always respond with valid JSON only, no markdown formatting.' },
@@ -141,11 +90,11 @@ Make questions challenging but solvable verbally without paper.`;
     }
 
     console.log('Using mock questions - Groq unavailable or parse error');
-    return getMockQuestions(category, topic, numQuestions);
+    return getMockQuestions(interviewType, numQuestions);
 }
 
 // Evaluate interview response
-export async function evaluateResponse(category, question, answer) {
+export async function evaluateResponse(interviewType, question, answer) {
     if (!answer || answer.trim().length < 10) {
         return {
             score: 2,
@@ -156,7 +105,7 @@ export async function evaluateResponse(category, question, answer) {
         };
     }
 
-    const prompt = `You are an interview coach. Evaluate this ${category} interview response.
+    const prompt = `You are an interview coach. Evaluate this interview response for a "${interviewType}" interview.
 
 Question: ${question}
 Candidate's Answer: ${answer}
@@ -227,46 +176,16 @@ Provide insights in JSON format only, no markdown:
 }
 
 // Mock data functions
-function getMockQuestions(category, topic = null, numQuestions = 5) {
-    const mockQuestions = {
-        hr: [
-            { id: 1, question: "Tell me about yourself and your educational background.", tips: "Keep it professional, focus on relevant experiences." },
-            { id: 2, question: "What are your greatest strengths and how do they help you?", tips: "Use specific examples to back up your claims." },
-            { id: 3, question: "Where do you see yourself in 5 years?", tips: "Show ambition while being realistic about growth." },
-            { id: 4, question: "Why should we hire you over other candidates?", tips: "Focus on unique value you can add to the company." },
-            { id: 5, question: "Describe a challenging situation and how you handled it.", tips: "Use the STAR method: Situation, Task, Action, Result." },
-        ],
-        technical: {
-            dsa: [
-                { id: 1, question: "Explain the difference between an array and a linked list. When would you use each?", tips: "Compare access time, insertion, deletion operations." },
-                { id: 2, question: "What is the time complexity of binary search and why is it efficient?", tips: "Explain the divide and conquer approach." },
-                { id: 3, question: "Describe how a stack data structure works and give a real-world example.", tips: "LIFO principle, mention function call stack." },
-                { id: 4, question: "What is a hash table and how does it handle collisions?", tips: "Discuss chaining and open addressing methods." },
-                { id: 5, question: "Explain the difference between BFS and DFS graph traversal algorithms.", tips: "Queue vs Stack, use cases for each." },
-            ],
-            default: [
-                { id: 1, question: "Explain the difference between stack and queue data structures.", tips: "LIFO vs FIFO, real-world examples." },
-                { id: 2, question: "What is object-oriented programming and its four pillars?", tips: "Encapsulation, Inheritance, Polymorphism, Abstraction." },
-                { id: 3, question: "How would you optimize a slow database query?", tips: "Indexing, query analysis, caching strategies." },
-                { id: 4, question: "Explain RESTful API principles.", tips: "HTTP methods, statelessness, resource-based URLs." },
-                { id: 5, question: "Describe a project you worked on and challenges you faced.", tips: "Be specific about your role and contributions." },
-            ],
-        },
-        aptitude: [
-            { id: 1, question: "If 6 workers can complete a task in 12 days, how many days would 9 workers take?", tips: "Use inverse proportionality: more workers = fewer days." },
-            { id: 2, question: "Find the next number in the sequence: 2, 6, 12, 20, 30, ?", tips: "Look at the differences between consecutive numbers." },
-            { id: 3, question: "A train travels 360 km in 4 hours. What is its speed in meters per second?", tips: "Convert km/h to m/s by multiplying by 5/18." },
-            { id: 4, question: "If all Roses are Flowers, and some Flowers fade quickly, can we say some Roses fade quickly?", tips: "Be careful with logical deduction in syllogisms." },
-            { id: 5, question: "Complete the analogy: Book is to Reading as Fork is to ?", tips: "Identify the functional relationship between pairs." },
-        ],
-    };
-
-    let questions;
-    if (category === 'technical') {
-        questions = mockQuestions.technical[topic] || mockQuestions.technical.default;
-    } else {
-        questions = mockQuestions[category] || mockQuestions.hr;
-    }
+function getMockQuestions(interviewType, numQuestions = 5) {
+    const questions = [
+        { id: 1, question: "Tell me about yourself and your background.", tips: "Keep it professional, focus on relevant experiences." },
+        { id: 2, question: "What are your greatest strengths and how do they help you?", tips: "Use specific examples to back up your claims." },
+        { id: 3, question: "Why are you interested in this opportunity?", tips: "Show genuine enthusiasm and connect it to your goals." },
+        { id: 4, question: "Describe a challenging situation and how you handled it.", tips: "Use the STAR method: Situation, Task, Action, Result." },
+        { id: 5, question: "Where do you see yourself in the future?", tips: "Show ambition while being realistic about growth." },
+        { id: 6, question: "What makes you a good fit for this role?", tips: "Focus on your unique value and relevant skills." },
+        { id: 7, question: "How do you handle pressure or tight deadlines?", tips: "Give a real example of working under pressure." },
+    ];
     // Repeat questions if numQuestions exceeds available mock questions
     while (questions.length < numQuestions) {
         questions = [...questions, ...questions.map((q, i) => ({ ...q, id: questions.length + i + 1 }))];

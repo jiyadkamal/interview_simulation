@@ -1,43 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { DashboardLayout } from '../components/layout';
-import { Mic, MicOff, ArrowRight, Check, Brain, MessageSquare, Calculator, Volume2, VolumeX, ChevronLeft } from 'lucide-react';
+import { Mic, MicOff, ArrowRight, Check, Volume2, VolumeX, ChevronLeft, Search } from 'lucide-react';
 import { useSpeechToText } from '../hooks';
 import { interviewAPI } from '../services/api';
 import './Practice.css';
 
-const categories = [
-    {
-        id: 'hr',
-        name: 'HR Interview',
-        icon: MessageSquare,
-        color: '#52c6c9',
-        description: 'Behavioral & situational questions',
-        topics: null // No topic selection for HR
-    },
-    {
-        id: 'technical',
-        name: 'Technical',
-        icon: Brain,
-        color: '#a78bfa',
-        description: 'Programming & problem-solving',
-        topics: [
-            { id: 'dsa', name: 'Data Structures & Algorithms' },
-            { id: 'webdev', name: 'Web Development' },
-            { id: 'python', name: 'Python Programming' },
-            { id: 'java', name: 'Java Programming' },
-            { id: 'database', name: 'Database & SQL' },
-            { id: 'os', name: 'Operating Systems' },
-            { id: 'networking', name: 'Computer Networks' },
-        ]
-    },
-    {
-        id: 'aptitude',
-        name: 'Aptitude',
-        icon: Calculator,
-        color: '#4ade80',
-        description: 'Logical reasoning & math',
-        topics: null // No topic selection for Aptitude
-    },
+const presetTypes = [
+    { label: 'School Entry', value: 'Interview for school entry' },
+    { label: 'College Admission', value: 'Interview for college admission' },
+    { label: 'Job Interview (HR)', value: 'HR/Behavioral job interview' },
+    { label: 'Technical Interview', value: 'Technical software engineering interview' },
+    { label: 'MBA Admission', value: 'MBA admission interview' },
+    { label: 'Internship', value: 'Internship interview' },
+    { label: 'Scholarship', value: 'Scholarship interview' },
+    { label: 'Government Job', value: 'Government job interview' },
 ];
 
 // Text-to-Speech function
@@ -66,9 +42,8 @@ const speakQuestion = (text) => {
 };
 
 export default function Practice() {
-    const [stage, setStage] = useState('select'); // select, topic, count, interview, results
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const [selectedTopic, setSelectedTopic] = useState(null);
+    const [stage, setStage] = useState('select'); // select, count, interview, results
+    const [interviewType, setInterviewType] = useState('');
     const [numQuestions, setNumQuestions] = useState(5);
     const [interview, setInterview] = useState(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -95,34 +70,26 @@ export default function Practice() {
         }
     }, [currentQuestion, stage, autoSpeak]);
 
-    const handleCategorySelect = (category) => {
-        setSelectedCategory(category);
-        const cat = categories.find(c => c.id === category);
-
-        if (cat.topics) {
-            // Go to topic selection for technical
-            setStage('topic');
-        } else {
-            // Go to question count selection
-            setStage('count');
-        }
+    const handleTypeSelect = (value) => {
+        setInterviewType(value);
     };
 
-    const handleTopicSelect = (topicId) => {
-        setSelectedTopic(topicId);
-        setStage('count');
+    const handleContinue = () => {
+        if (interviewType.trim().length >= 2) {
+            setStage('count');
+        }
     };
 
     const handleStartWithCount = () => {
         const count = Math.min(20, Math.max(1, numQuestions));
         setNumQuestions(count);
-        startInterview(selectedCategory, selectedTopic, count);
+        startInterview(interviewType.trim(), count);
     };
 
-    const startInterview = async (category, topic, count) => {
+    const startInterview = async (type, count) => {
         setIsLoading(true);
         try {
-            const data = await interviewAPI.startInterview(category, topic, count);
+            const data = await interviewAPI.startInterview(type, count);
             setInterview(data);
             setStage('interview');
             setCurrentQuestionIndex(0);
@@ -190,8 +157,7 @@ export default function Practice() {
     const resetPractice = () => {
         stopSpeaking();
         setStage('select');
-        setSelectedCategory(null);
-        setSelectedTopic(null);
+        setInterviewType('');
         setNumQuestions(5);
         setInterview(null);
         setResults(null);
@@ -201,83 +167,53 @@ export default function Practice() {
     };
 
     const goBack = () => {
-        if (stage === 'topic') {
+        if (stage === 'count') {
             setStage('select');
-            setSelectedCategory(null);
-        } else if (stage === 'count') {
-            const cat = categories.find(c => c.id === selectedCategory);
-            if (cat?.topics) {
-                setStage('topic');
-                setSelectedTopic(null);
-            } else {
-                setStage('select');
-                setSelectedCategory(null);
-            }
         }
     };
 
     return (
         <DashboardLayout>
             <div className="practice">
-                {/* Category Selection */}
+                {/* Interview Type Selection */}
                 {stage === 'select' && (
                     <div className="practice__select animate-fade-in">
-                        <h2 className="practice__title">Choose Interview Type</h2>
-                        <p className="practice__subtitle">Select a category to start your practice session</p>
+                        <h2 className="practice__title">What type of interview?</h2>
+                        <p className="practice__subtitle">Type your interview type or pick one from below</p>
 
-                        <div className="practice__categories">
-                            {categories.map((cat) => (
+                        <div className="practice__type-input-wrap glass-card">
+                            <Search size={20} className="practice__type-input-icon" />
+                            <input
+                                type="text"
+                                className="practice__type-input"
+                                value={interviewType}
+                                onChange={(e) => setInterviewType(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleContinue()}
+                                placeholder="e.g. Interview for school entry, MBA admission..."
+                                autoFocus
+                            />
+                        </div>
+
+                        <div className="practice__presets">
+                            {presetTypes.map((preset) => (
                                 <button
-                                    key={cat.id}
-                                    className="practice__category glass-card"
-                                    onClick={() => handleCategorySelect(cat.id)}
-                                    disabled={isLoading}
-                                    style={{ '--cat-color': cat.color }}
+                                    key={preset.value}
+                                    className={`practice__preset-btn ${interviewType === preset.value ? 'practice__preset-btn--active' : ''}`}
+                                    onClick={() => handleTypeSelect(preset.value)}
                                 >
-                                    <div className="practice__category-icon">
-                                        <cat.icon size={32} />
-                                    </div>
-                                    <h3 className="practice__category-name">{cat.name}</h3>
-                                    <p className="practice__category-desc">{cat.description}</p>
-                                    {cat.topics && <span className="practice__category-badge">Select Topic</span>}
-                                    <ArrowRight size={20} className="practice__category-arrow" />
+                                    {preset.label}
                                 </button>
                             ))}
                         </div>
-                    </div>
-                )}
 
-                {/* Topic Selection for Technical */}
-                {stage === 'topic' && (
-                    <div className="practice__topic animate-fade-in">
-                        <button className="practice__back-btn" onClick={goBack}>
-                            <ChevronLeft size={20} />
-                            Back
+                        <button
+                            className="practice__continue-btn"
+                            onClick={handleContinue}
+                            disabled={interviewType.trim().length < 2}
+                        >
+                            Continue
+                            <ArrowRight size={18} />
                         </button>
-
-                        <h2 className="practice__title">Select Technical Topic</h2>
-                        <p className="practice__subtitle">Choose a topic for your technical interview</p>
-
-                        <div className="practice__topics">
-                            {categories.find(c => c.id === selectedCategory)?.topics?.map((topic) => (
-                                <button
-                                    key={topic.id}
-                                    className="practice__topic-btn glass-card"
-                                    onClick={() => handleTopicSelect(topic.id)}
-                                    disabled={isLoading}
-                                >
-                                    <span>{topic.name}</span>
-                                    <ArrowRight size={18} />
-                                </button>
-                            ))}
-                        </div>
-
-                        {isLoading && (
-                            <div className="practice__loading">
-                                <div className="practice__loading-spinner"></div>
-                                <p>Preparing your interview questions...</p>
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -291,8 +227,7 @@ export default function Practice() {
 
                         <h2 className="practice__title">How Many Questions?</h2>
                         <p className="practice__subtitle">
-                            Choose the number of questions for your {categories.find(c => c.id === selectedCategory)?.name} session
-                            {selectedTopic && ` — ${categories.find(c => c.id === selectedCategory)?.topics?.find(t => t.id === selectedTopic)?.name}`}
+                            Choose the number of questions for your <strong>{interviewType}</strong> session
                         </p>
 
                         <div className="practice__count-input-wrap">
@@ -345,8 +280,7 @@ export default function Practice() {
                         <div className="practice__question glass-card">
                             <div className="practice__question-header">
                                 <span className="practice__question-badge">
-                                    {categories.find(c => c.id === selectedCategory)?.name}
-                                    {selectedTopic && ` - ${categories.find(c => c.id === selectedCategory)?.topics?.find(t => t.id === selectedTopic)?.name}`}
+                                    {interviewType}
                                 </span>
                                 <button
                                     className={`practice__speak-btn ${isSpeaking ? 'practice__speak-btn--active' : ''}`}
@@ -414,7 +348,7 @@ export default function Practice() {
                                 <Check size={40} />
                             </div>
                             <h2>Interview Complete!</h2>
-                            <p>You've completed the {categories.find(c => c.id === selectedCategory)?.name} practice session</p>
+                            <p>You've completed the <strong>{interviewType}</strong> practice session</p>
                         </div>
 
                         <div className="practice__results-stats">
@@ -459,7 +393,7 @@ export default function Practice() {
                         )}
 
                         <button className="practice__restart-btn" onClick={resetPractice}>
-                            Practice Another Category
+                            Practice Another Interview
                         </button>
                     </div>
                 )}

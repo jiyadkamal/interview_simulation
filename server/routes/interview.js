@@ -8,25 +8,24 @@ const router = express.Router();
 // Start a new interview session
 router.post('/start', authenticateToken, async (req, res) => {
     try {
-        const { category, topic, numQuestions: rawNum } = req.body;
+        const { interviewType, numQuestions: rawNum } = req.body;
         const userId = req.user.userId;
 
-        if (!['hr', 'technical', 'aptitude'].includes(category)) {
-            return res.status(400).json({ error: 'Invalid category. Use: hr, technical, or aptitude' });
+        if (!interviewType || typeof interviewType !== 'string' || interviewType.trim().length < 2) {
+            return res.status(400).json({ error: 'Please provide a valid interview type' });
         }
 
         // Clamp numQuestions to 1-20, default 5
         const numQuestions = Math.min(20, Math.max(1, parseInt(rawNum) || 5));
 
-        // Generate questions using Gemini (with topic for technical)
-        const questions = await generateInterviewQuestions(category, topic, numQuestions);
+        // Generate questions using Groq AI based on interview type
+        const questions = await generateInterviewQuestions(interviewType.trim(), numQuestions);
 
         const interviewId = `interview_${Date.now()}`;
         const interviewData = {
             id: interviewId,
             userId,
-            category,
-            topic: topic || null,
+            interviewType: interviewType.trim(),
             questions,
             responses: [],
             status: 'in_progress',
@@ -43,8 +42,7 @@ router.post('/start', authenticateToken, async (req, res) => {
 
         res.json({
             interviewId,
-            category,
-            topic: topic || null,
+            interviewType: interviewType.trim(),
             questions: questions.map(q => ({ id: q.id, question: q.question, tips: q.tips })),
             totalQuestions: questions.length,
         });
@@ -81,8 +79,8 @@ router.post('/submit-answer', authenticateToken, async (req, res) => {
             return res.status(400).json({ error: 'Question not found' });
         }
 
-        // Evaluate the answer using Gemini
-        const evaluation = await evaluateResponse(interview.category, question.question, speechText || answer);
+        // Evaluate the answer using Groq AI
+        const evaluation = await evaluateResponse(interview.interviewType, question.question, speechText || answer);
 
         const responseData = {
             questionId,
@@ -181,7 +179,7 @@ router.post('/complete', authenticateToken, async (req, res) => {
         res.json({
             success: true,
             results: {
-                category: interview.category,
+                interviewType: interview.interviewType,
                 totalQuestions: interview.questions.length,
                 answeredQuestions: responses.length,
                 averageScore: finalScore,
@@ -217,7 +215,7 @@ router.get('/history', authenticateToken, async (req, res) => {
         res.json({
             interviews: interviews.map(i => ({
                 id: i.id,
-                category: i.category,
+                interviewType: i.interviewType,
                 status: i.status,
                 totalScore: i.totalScore,
                 startedAt: i.startedAt,
